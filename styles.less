@@ -1,0 +1,84 @@
+* {
+  font-family: sans-serif;
+}
+
+table {
+  display: grid;
+  grid-template-columns: 1fr 2fr 5fr;
+  thead,
+  tbody,
+  tfoot,
+  tr {
+    display: contents;
+  }
+  th,
+  td {
+    display: block;
+
+    &[colspan="3"] {
+      grid-column: auto / span 3;
+    }
+    &[rowspan="4"] {
+      grid-row: auto / span 4;
+    }
+    &[rowspan="16"] {
+      grid-row: auto / span 16;
+    }
+  }
+}
+
+a {
+  display: block;
+  width: 100%;
+  height: 100%;
+
+  text-decoration: none;
+  color: #333;
+
+  :hover {
+    color: #ccc;
+  }
+}
+
+table {
+  // vertical-align: middle;
+  text-align: center;
+  tbody {
+    th {
+      width: 100px;
+    }
+  }
+  th {
+    background-color: #ddd;
+    :hover {
+      background: #323232;
+      color: #fff;
+    }
+  }
+  td {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    :hover {
+      background: #333;
+      color: #fff;
+    }
+    &.false {
+      background-color: #ccc;
+    }
+    &.true {
+      background-color: greenyellow;
+    }
+    input {
+      display: none;
+    }
+  }
+  gap: 2px;
+}
+
+section#calendar {
+  display: grid;
+  column-gap: 8px;
+  grid-template-columns: repeat(7, 1fr);
+}
