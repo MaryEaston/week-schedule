@@ -14,8 +14,8 @@ use gloo_console::log;
 fn init(url: Url, _: &mut impl Orders<Msg>) -> Model {
     match url.search().get("data") {
         Some(data) =>
-            Model { counter: 0, check: Model::string_to_check(data.first().unwrap().to_string()) },
-        None => Model { counter: 0, check: [false; 672] },
+            Model { day: 0, check: Model::string_to_check(data.first().unwrap().to_string()) },
+        None => Model { day: 0, check: [false; 672] },
     }
 }
 
@@ -25,7 +25,7 @@ fn init(url: Url, _: &mut impl Orders<Msg>) -> Model {
 
 // `Model` describes our app state.
 struct Model {
-    counter: i32,
+    day: i32,
     check: [bool; 672],
     // check: Bytes<bool>,
 }
@@ -210,6 +210,7 @@ impl Model {
 // `Msg` describes the different events you can modify state with.
 enum Msg {
     Check((bool, i32, i32, i32, i32)),
+    ChangeDay(i32),
 }
 
 // `update` describes how to handle each `Msg`.
@@ -219,7 +220,9 @@ fn update(msg: Msg, model: &mut Model, _: &mut impl Orders<Msg>) {
         Msg::Check((value, day, hours, hour, minuit)) => {
             log!("msg: {:?}", hour * 4 + minuit);
             check(model, value, day, hours, hour, minuit);
-            model.counter += 1;
+        }
+        Msg::ChangeDay(day) => {
+            model.day = day;
         }
     }
 }
@@ -239,6 +242,10 @@ fn is_checked(model: &Model, day: i32, hours: i32, hour: i32, minuit: i32) -> bo
         is &= model.check[index as usize];
     }
     is
+}
+
+fn is_day_checked(model: &Model, day: i32) -> bool {
+    model.day == day
 }
 
 fn check(model: &mut Model, value: bool, day: i32, hours: i32, hour: i32, minuit: i32) {
@@ -335,9 +342,10 @@ fn trs(model: &Model, day: i32, section: i32) -> Vec<Node<Msg>> {
 fn view(model: &Model) -> Node<Msg> {
     div!(
         section!(
-            attrs!(At::Id => "calendar"),
+            C!("pc"),
+            attrs!(At::Id => "calender"),
             table!(
-                C!("gridTable", "gap"),
+                C!("calender"),
                 thead!(th!(attrs!(At::ColSpan => "3"), "日")),
                 trs(model, 0, 0),
                 trs(model, 0, 1),
@@ -347,7 +355,7 @@ fn view(model: &Model) -> Node<Msg> {
                 trs(model, 0, 5)
             ),
             table!(
-                C!("gridTable", "gap"),
+                C!("calender"),
                 thead!(th!(attrs!(At::ColSpan => "3"), "月")),
                 trs(model, 1, 0),
                 trs(model, 1, 1),
@@ -357,7 +365,7 @@ fn view(model: &Model) -> Node<Msg> {
                 trs(model, 1, 5)
             ),
             table!(
-                C!("gridTable", "gap"),
+                C!("calender"),
                 thead!(th!(attrs!(At::ColSpan => "3"), "火")),
                 trs(model, 2, 0),
                 trs(model, 2, 1),
@@ -367,7 +375,7 @@ fn view(model: &Model) -> Node<Msg> {
                 trs(model, 2, 5)
             ),
             table!(
-                C!("gridTable", "gap"),
+                C!("calender"),
                 thead!(th!(attrs!(At::ColSpan => "3"), "水")),
                 trs(model, 3, 0),
                 trs(model, 3, 1),
@@ -377,7 +385,7 @@ fn view(model: &Model) -> Node<Msg> {
                 trs(model, 3, 5)
             ),
             table!(
-                C!("gridTable", "gap"),
+                C!("calender"),
                 thead!(th!(attrs!(At::ColSpan => "3"), "木")),
                 trs(model, 4, 0),
                 trs(model, 4, 1),
@@ -387,7 +395,7 @@ fn view(model: &Model) -> Node<Msg> {
                 trs(model, 4, 5)
             ),
             table!(
-                C!("gridTable", "gap"),
+                C!("calender"),
                 thead!(th!(attrs!(At::ColSpan => "3"), "金")),
                 trs(model, 5, 0),
                 trs(model, 5, 1),
@@ -397,7 +405,7 @@ fn view(model: &Model) -> Node<Msg> {
                 trs(model, 5, 5)
             ),
             table!(
-                C!("gridTable", "gap"),
+                C!("calender"),
                 thead!(th!(attrs!(At::ColSpan => "3"), "土")),
                 trs(model, 6, 0),
                 trs(model, 6, 1),
@@ -405,6 +413,81 @@ fn view(model: &Model) -> Node<Msg> {
                 trs(model, 6, 3),
                 trs(model, 6, 4),
                 trs(model, 6, 5)
+            )
+        ),
+        section!(
+            C!("phone"),
+            attrs!(At::Id => "calendar"),
+            table!(
+                C!("day"),
+                thead!(
+                    th!(
+                        C![is_day_checked(model, 0).to_string()],
+                        a!(
+                            ev(Ev::Click, move |_| Msg::ChangeDay(0)),
+                            attrs!(At::Href => ""),
+                            "日"
+                        )
+                    ),
+                    th!(
+                        C![is_day_checked(model, 1).to_string()],
+                        a!(
+                            ev(Ev::Click, move |_| Msg::ChangeDay(1)),
+                            attrs!(At::Href => ""),
+                            "月"
+                        )
+                    ),
+                    th!(
+                        C![is_day_checked(model, 2).to_string()],
+                        a!(
+                            ev(Ev::Click, move |_| Msg::ChangeDay(2)),
+                            attrs!(At::Href => ""),
+                            "火"
+                        )
+                    ),
+                    th!(
+                        C![is_day_checked(model, 3).to_string()],
+                        a!(
+                            ev(Ev::Click, move |_| Msg::ChangeDay(3)),
+                            attrs!(At::Href => ""),
+                            "水"
+                        )
+                    ),
+                    th!(
+                        C![is_day_checked(model, 4).to_string()],
+                        a!(
+                            ev(Ev::Click, move |_| Msg::ChangeDay(4)),
+                            attrs!(At::Href => ""),
+                            "木"
+                        )
+                    ),
+                    th!(
+                        C![is_day_checked(model, 5).to_string()],
+                        a!(
+                            ev(Ev::Click, move |_| Msg::ChangeDay(5)),
+                            attrs!(At::Href => ""),
+                            "金"
+                        )
+                    ),
+                    th!(
+                        C![is_day_checked(model, 6).to_string()],
+                        a!(
+                            ev(Ev::Click, move |_| Msg::ChangeDay(6)),
+                            attrs!(At::Href => ""),
+                            "土"
+                        )
+                    )
+                )
+            ),
+            table!(
+                C!("calender"),
+                // thead!(th!(attrs!(At::ColSpan => "3"), "日")),
+                trs(model, model.day, 0),
+                trs(model, model.day, 1),
+                trs(model, model.day, 2),
+                trs(model, model.day, 3),
+                trs(model, model.day, 4),
+                trs(model, model.day, 5)
             )
         ),
         p!(model.check_to_string())
