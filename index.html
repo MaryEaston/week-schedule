@@ -8,26 +8,30 @@
     />
     <link
       rel="modulepreload"
-      href="/pkg/package.js"
+      href="https://maryeaston.github.io/week-schedule/pkg/package.js"
       as="script"
       type="text/javascript"
     />
     <link
       rel="preload"
-      href="/pkg/package_bg.wasm"
+      href="https://maryeaston.github.io/week-schedule/pkg/package_bg.wasm"
       as="fetch"
       type="application/wasm"
       crossorigin="anonymous"
     />
-    <link rel="stylesheet/less" type="text/css" href="styles.less" />
-    <script src="http://cdnjs.cloudflare.com/ajax/libs/less.js/4.2.0/less.min.js"></script>
+    <link
+      rel="stylesheet/less"
+      type="text/css"
+      href="https://maryeaston.github.io/week-schedule/styles.less"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/less.js/4.2.0/less.min.js"></script>
   </head>
 
   <body>
     <section id="app"></section>
     <script type="module">
-      import init from "/pkg/package.js";
-      init("/pkg/package_bg.wasm");
+      import init from "https://maryeaston.github.io/week-schedule/pkg/package.js";
+      init("https://maryeaston.github.io/week-schedule/pkg/package_bg.wasm");
     </script>
   </body>
 </html>
