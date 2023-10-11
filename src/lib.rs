@@ -8,7 +8,7 @@ mod data;
 use data::Data;
 
 use gloo_console::log;
-use seed::{prelude::*, *};
+use seed::{ prelude::*, * };
 
 // ------ ------
 //     Init
@@ -17,14 +17,16 @@ use seed::{prelude::*, *};
 // `init` describes what should happen when your app started.
 fn init(url: Url, _: &mut impl Orders<Msg>) -> Model {
     match url.search().get("data") {
-        Some(data) => Model {
-            day: 0,
-            check: Data::from(data.first().unwrap().to_string()),
-        },
-        None => Model {
-            day: 0,
-            check: Data::new(),
-        },
+        Some(data) =>
+            Model {
+                day: 0,
+                check: Data::from(data.first().unwrap().to_string()),
+            },
+        None =>
+            Model {
+                day: 0,
+                check: Data::new(),
+            },
     }
 }
 
@@ -134,9 +136,7 @@ fn minuit_td(model: &Model, day: i32, hours: i32, hour: i32, minuit: i32) -> Nod
         C!(is.to_string()),
         size,
         a!(
-            ev(Ev::Click, move |_| Msg::Check((
-                !is, day, hours, hour, minuit
-            ))),
+            ev(Ev::Click, move |_| Msg::Check((!is, day, hours, hour, minuit))),
             attrs!(At::Href => ""),
             text
         ),
@@ -174,7 +174,7 @@ fn trs(model: &Model, day: i32, section: i32) -> Vec<Node<Msg>> {
         ),
         tr!(minuit_td(model, day, section, section * 4 + 3, 1)),
         tr!(minuit_td(model, day, section, section * 4 + 3, 2)),
-        tr!(minuit_td(model, day, section, section * 4 + 3, 3)),
+        tr!(minuit_td(model, day, section, section * 4 + 3, 3))
     ]
 }
 
@@ -189,8 +189,20 @@ fn view(model: &Model) -> Node<Msg> {
             C!("pc"),
             attrs!(At::Id => "calender"),
             table!(
+                C!("day"),
+                thead!(
+                    th!(C!["false"], "日"),
+                    th!(C!["false"], "月"),
+                    th!(C!["false"], "火"),
+                    th!(C!["false"], "水"),
+                    th!(C!["false"], "木"),
+                    th!(C!["false"], "金"),
+                    th!(C!["false"], "土")
+                )
+            ),
+            table!(
                 C!("calender"),
-                thead!(th!(attrs!(At::ColSpan => "3"), "日")),
+                thead!(th!(attrs!(At::ColSpan => "3"), "　")),
                 trs(model, 0, 0),
                 trs(model, 0, 1),
                 trs(model, 0, 2),
@@ -200,7 +212,7 @@ fn view(model: &Model) -> Node<Msg> {
             ),
             table!(
                 C!("calender"),
-                thead!(th!(attrs!(At::ColSpan => "3"), "月")),
+                thead!(th!(attrs!(At::ColSpan => "3"), "　")),
                 trs(model, 1, 0),
                 trs(model, 1, 1),
                 trs(model, 1, 2),
@@ -210,7 +222,7 @@ fn view(model: &Model) -> Node<Msg> {
             ),
             table!(
                 C!("calender"),
-                thead!(th!(attrs!(At::ColSpan => "3"), "火")),
+                thead!(th!(attrs!(At::ColSpan => "3"), "　")),
                 trs(model, 2, 0),
                 trs(model, 2, 1),
                 trs(model, 2, 2),
@@ -220,7 +232,7 @@ fn view(model: &Model) -> Node<Msg> {
             ),
             table!(
                 C!("calender"),
-                thead!(th!(attrs!(At::ColSpan => "3"), "水")),
+                thead!(th!(attrs!(At::ColSpan => "3"), "　")),
                 trs(model, 3, 0),
                 trs(model, 3, 1),
                 trs(model, 3, 2),
@@ -230,7 +242,7 @@ fn view(model: &Model) -> Node<Msg> {
             ),
             table!(
                 C!("calender"),
-                thead!(th!(attrs!(At::ColSpan => "3"), "木")),
+                thead!(th!(attrs!(At::ColSpan => "3"), "　")),
                 trs(model, 4, 0),
                 trs(model, 4, 1),
                 trs(model, 4, 2),
@@ -240,7 +252,7 @@ fn view(model: &Model) -> Node<Msg> {
             ),
             table!(
                 C!("calender"),
-                thead!(th!(attrs!(At::ColSpan => "3"), "金")),
+                thead!(th!(attrs!(At::ColSpan => "3"), "　")),
                 trs(model, 5, 0),
                 trs(model, 5, 1),
                 trs(model, 5, 2),
@@ -250,7 +262,7 @@ fn view(model: &Model) -> Node<Msg> {
             ),
             table!(
                 C!("calender"),
-                thead!(th!(attrs!(At::ColSpan => "3"), "土")),
+                thead!(th!(attrs!(At::ColSpan => "3"), "　")),
                 trs(model, 6, 0),
                 trs(model, 6, 1),
                 trs(model, 6, 2),
@@ -323,9 +335,9 @@ fn view(model: &Model) -> Node<Msg> {
                     )
                 )
             ),
+            table!(thead!(th!(a!("　")))),
             table!(
                 C!("calender"),
-                // thead!(th!(attrs!(At::ColSpan => "3"), "日")),
                 trs(model, model.day, 0),
                 trs(model, model.day, 1),
                 trs(model, model.day, 2),
