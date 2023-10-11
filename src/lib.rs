@@ -44,11 +44,12 @@ struct Model {
 // ------ ------
 
 // (Remove the line below once any of your `Msg` variants doesn't implement `Copy`.)
-#[derive(Copy, Clone)]
+#[derive(Clone)]
 // `Msg` describes the different events you can modify state with.
 enum Msg {
     Check((bool, i32, i32, i32, i32)),
     ChangeDay(i32),
+    Input(String),
 }
 
 // `update` describes how to handle each `Msg`.
@@ -61,6 +62,13 @@ fn update(msg: Msg, model: &mut Model, _: &mut impl Orders<Msg>) {
         }
         Msg::ChangeDay(day) => {
             model.day = day;
+        }
+        Msg::Input(text) => {
+            let mut datas: Vec<Data> = vec![];
+            for line in text.lines() {
+                datas.push(Data::from(line));
+            }
+            model.check = Data::and(datas);
         }
     }
 }
@@ -326,7 +334,9 @@ fn view(model: &Model) -> Node<Msg> {
                 trs(model, model.day, 5)
             )
         ),
-        p!(model.check.to_string())
+        p!(format!("予定コード : {:?}", model.check.to_string())),
+        p!("予定コード入力欄"),
+        textarea!(input_ev(Ev::Input, move |text| Msg::Input(text)))
     )
 }
 

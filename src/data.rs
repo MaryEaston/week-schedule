@@ -5,6 +5,14 @@ pub struct Data {
 impl From<String> for Data {
     fn from(item: String) -> Self {
         Data {
+            check: string_to_check(&item),
+        }
+    }
+}
+
+impl From<&str> for Data {
+    fn from(item: &str) -> Self {
+        Data {
             check: string_to_check(item),
         }
     }
@@ -15,6 +23,16 @@ impl Data {
         Data {
             check: [false; 672],
         }
+    }
+
+    pub fn and(datas: Vec<Data>) -> Self {
+        let mut check = [true; 672];
+        for data in datas {
+            for (i, bit) in data.check.iter().enumerate() {
+                check[i] &= bit
+            }
+        }
+        Data { check: check }
     }
 
     pub fn to_string(&self) -> String {
@@ -110,7 +128,7 @@ fn _int_to_char(int: i32) -> char {
     }
 }
 
-fn string_to_check(data: String) -> [bool; 672] {
+fn string_to_check(data: &str) -> [bool; 672] {
     let mut check: [bool; 672] = [false; 672];
     for (i, c) in data.chars().enumerate() {
         let (b5, b4, b3, b2, b1, b0) = _char_to_bits(c);
