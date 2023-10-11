@@ -49,10 +49,6 @@ a {
 
   text-decoration: none;
   color: #333;
-
-  :hover {
-    color: #ccc;
-  }
 }
 
 table {
@@ -68,15 +64,11 @@ table {
       color: #eee;
     }
 
-    :hover {
-      background: #555;
-    }
-
     &.false {
       background-color: #888;
     }
     &.true {
-      background-color: #333;
+      background-color: #555;
     }
   }
   td {
@@ -84,10 +76,6 @@ table {
     justify-content: center;
     align-items: center;
 
-    :hover {
-      background: #888;
-      color: #fff;
-    }
     &.false {
       background-color: #ccc;
     }
@@ -100,19 +88,6 @@ table {
   }
   gap: 2px;
 }
-
-// section.phone {
-//   display: none;
-// }
-// section.pc {
-//   display: grid;
-//   column-gap: 8px;
-//   grid-template-columns: repeat(7, 1fr);
-// }
-
-// section.pc {
-//   display: none;
-// }
 
 // スマホ
 @media (max-width: 850px) {
@@ -130,5 +105,24 @@ table {
     display: grid;
     column-gap: 8px;
     grid-template-columns: repeat(7, 1fr);
+  }
+  a{
+    :hover {
+      color: #ccc;
+    }
+  }
+  table{
+    th{
+      :hover {
+        background: #555;
+      }
+    }
+
+    td{
+      :hover {
+        background: #888;
+        color: #fff;
+      }
+    }
   }
 }
