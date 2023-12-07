@@ -36,32 +36,18 @@ impl Data {
         Data { check: check }
     }
 
-    pub fn _to_string(&self) -> String {
-        let mut string = "".to_string();
-        for i in 0..112 {
-            let int = (self.check[i * 6 + 0] as u16) * 1
-                + (self.check[i * 6 + 1] as u16) * 2
-                + (self.check[i * 6 + 2] as u16) * 4
-                + (self.check[i * 6 + 3] as u16) * 8
-                + (self.check[i * 6 + 4] as u16) * 16
-                + (self.check[i * 6 + 5] as u16) * 32;
-            string.insert(i, _int_to_char(int));
-        }
-        string
-    }
-
     pub fn to_string(&self) -> String {
         let mut string: String = "".to_string();
 
         let mut mode: bool = false;
         let mut count: u16 = 0;
-        for i in 0..671 {
-            if self.check[i] == mode {
+        for bit in self.check {
+            if !(bit ^ mode) {
                 count += 1;
             } else {
                 mode = !mode;
-                string = string + &_int_to_string(count);
-                count = 0;
+                string = string + &int_to_string(count);
+                count = 1;
             }
         }
         string
@@ -76,7 +62,7 @@ impl Data {
     }
 }
 
-fn _int_to_char(int: u16) -> char {
+fn int_to_char(int: u16) -> char {
     match int {
         0 => 'A',
         1 => 'B',
@@ -146,95 +132,107 @@ fn _int_to_char(int: u16) -> char {
     }
 }
 
-fn _int_to_string(int: u16) -> String {
+fn int_to_string(int: u16) -> String {
     let mut string = String::new();
-    let first = _int_to_char(int % 64);
-    let second = _int_to_char((int / 64) % 64);
-    string.push(first);
+    let first = int_to_char(int % 64);
+    let second = int_to_char((int / 64) % 64);
     string.push(second);
+    string.push(first);
     string
 }
 
-fn string_to_check(data: &str) -> [bool; 672] {
-    let mut check: [bool; 672] = [false; 672];
-    for (i, c) in data.chars().enumerate() {
-        let (b5, b4, b3, b2, b1, b0) = _char_to_bits(c);
-        check[i * 6 + 0] = b0;
-        check[i * 6 + 1] = b1;
-        check[i * 6 + 2] = b2;
-        check[i * 6 + 3] = b3;
-        check[i * 6 + 4] = b4;
-        check[i * 6 + 5] = b5;
+fn char_to_int(char: char) -> u16 {
+    match char {
+        'A' => 0,
+        'B' => 1,
+        'C' => 2,
+        'D' => 3,
+        'E' => 4,
+        'F' => 5,
+        'G' => 6,
+        'H' => 7,
+        'I' => 8,
+        'J' => 9,
+        'K' => 10,
+        'L' => 11,
+        'M' => 12,
+        'N' => 13,
+        'O' => 14,
+        'P' => 15,
+        'Q' => 16,
+        'R' => 17,
+        'S' => 18,
+        'T' => 19,
+        'U' => 20,
+        'V' => 21,
+        'W' => 22,
+        'X' => 23,
+        'Y' => 24,
+        'Z' => 25,
+        'a' => 26,
+        'b' => 27,
+        'c' => 28,
+        'd' => 29,
+        'e' => 30,
+        'f' => 31,
+        'g' => 32,
+        'h' => 33,
+        'i' => 34,
+        'j' => 35,
+        'k' => 36,
+        'l' => 37,
+        'm' => 38,
+        'n' => 39,
+        'o' => 40,
+        'p' => 41,
+        'q' => 42,
+        'r' => 43,
+        's' => 44,
+        't' => 45,
+        'u' => 46,
+        'v' => 47,
+        'w' => 48,
+        'x' => 49,
+        'y' => 50,
+        'z' => 51,
+        '0' => 52,
+        '1' => 53,
+        '2' => 54,
+        '3' => 55,
+        '4' => 56,
+        '5' => 57,
+        '6' => 58,
+        '7' => 59,
+        '8' => 60,
+        '9' => 61,
+        '-' => 62,
+        '_' => 63,
+        _ => 0,
     }
-    check
 }
 
-fn _char_to_bits(char: char) -> (bool, bool, bool, bool, bool, bool) {
-    match char {
-        'A' => (false, false, false, false, false, false),
-        'B' => (false, false, false, false, false, true),
-        'C' => (false, false, false, false, true, false),
-        'D' => (false, false, false, false, true, true),
-        'E' => (false, false, false, true, false, false),
-        'F' => (false, false, false, true, false, true),
-        'G' => (false, false, false, true, true, false),
-        'H' => (false, false, false, true, true, true),
-        'I' => (false, false, true, false, false, false),
-        'J' => (false, false, true, false, false, true),
-        'K' => (false, false, true, false, true, false),
-        'L' => (false, false, true, false, true, true),
-        'M' => (false, false, true, true, false, false),
-        'N' => (false, false, true, true, false, true),
-        'O' => (false, false, true, true, true, false),
-        'P' => (false, false, true, true, true, true),
-        'Q' => (false, true, false, false, false, false),
-        'R' => (false, true, false, false, false, true),
-        'S' => (false, true, false, false, true, false),
-        'T' => (false, true, false, false, true, true),
-        'U' => (false, true, false, true, false, false),
-        'V' => (false, true, false, true, false, true),
-        'W' => (false, true, false, true, true, false),
-        'X' => (false, true, false, true, true, true),
-        'Y' => (false, true, true, false, false, false),
-        'Z' => (false, true, true, false, false, true),
-        'a' => (false, true, true, false, true, false),
-        'b' => (false, true, true, false, true, true),
-        'c' => (false, true, true, true, false, false),
-        'd' => (false, true, true, true, false, true),
-        'e' => (false, true, true, true, true, false),
-        'f' => (false, true, true, true, true, true),
-        'g' => (true, false, false, false, false, false),
-        'h' => (true, false, false, false, false, true),
-        'i' => (true, false, false, false, true, false),
-        'j' => (true, false, false, false, true, true),
-        'k' => (true, false, false, true, false, false),
-        'l' => (true, false, false, true, false, true),
-        'm' => (true, false, false, true, true, false),
-        'n' => (true, false, false, true, true, true),
-        'o' => (true, false, true, false, false, false),
-        'p' => (true, false, true, false, false, true),
-        'q' => (true, false, true, false, true, false),
-        'r' => (true, false, true, false, true, true),
-        's' => (true, false, true, true, false, false),
-        't' => (true, false, true, true, false, true),
-        'u' => (true, false, true, true, true, false),
-        'v' => (true, false, true, true, true, true),
-        'w' => (true, true, false, false, false, false),
-        'x' => (true, true, false, false, false, true),
-        'y' => (true, true, false, false, true, false),
-        'z' => (true, true, false, false, true, true),
-        '0' => (true, true, false, true, false, false),
-        '1' => (true, true, false, true, false, true),
-        '2' => (true, true, false, true, true, false),
-        '3' => (true, true, false, true, true, true),
-        '4' => (true, true, true, false, false, false),
-        '5' => (true, true, true, false, false, true),
-        '6' => (true, true, true, false, true, false),
-        '7' => (true, true, true, false, true, true),
-        '8' => (true, true, true, true, false, false),
-        '9' => (true, true, true, true, false, true),
-        '-' => (true, true, true, true, true, false),
-        '_' => (true, true, true, true, true, true),
-        _ => (true, true, true, true, true, true),
+fn string_to_check(string: &str) -> [bool; 672] {
+    let mut ints: Vec<u16> = vec![];
+    let mut second: Option<u16> = Option::None;
+    for char in string.chars() {
+        match second {
+            Some(second_in) => {
+                ints.push(second_in * 64 + char_to_int(char));
+                second = Option::None;
+            }
+            None => second = Option::Some(char_to_int(char)),
+        }
     }
+
+    let mut check = [false; 672];
+    let mut cursor: u16 = 0;
+    let mut mode: bool = false;
+    for int in ints.iter() {
+        for i in 0..*int {
+            check[(cursor + i) as usize] = mode;
+        }
+        cursor += *int;
+        mode = !mode;
+    }
+    check
 }

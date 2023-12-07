@@ -8,7 +8,7 @@ mod data;
 use data::Data;
 
 use gloo_console::log;
-use seed::{ prelude::*, * };
+use seed::{prelude::*, *};
 
 // ------ ------
 //     Init
@@ -16,28 +16,41 @@ use seed::{ prelude::*, * };
 
 // `init` describes what should happen when your app started.
 fn init(url: Url, _: &mut impl Orders<Msg>) -> Model {
-    match url.search().get("data") {
-        Some(data) =>
-            Model {
-                day: 0,
-                check: Data::from(data.first().unwrap().to_string()),
-            },
-        None =>
-            Model {
-                day: 0,
-                check: Data::new(),
-            },
+    let view = match url.search().get("view") {
+        Some(view) => match &*view.first().unwrap().to_string() {
+            "all" => View::All,
+            "morning" => View::Morning,
+            "night" => View::Night,
+            "normal" => View::Normal,
+            _ => View::Normal,
+        },
+        None => View::Normal,
+    };
+    let check: Data = match url.search().get("data") {
+        Some(data) => Data::from(data.first().unwrap().to_string()),
+        None => Data::new(),
+    };
+    Model {
+        day: 0,
+        view: view,
+        check: check,
     }
 }
 
 // ------ ------
 //     Model
 // ------ ------
-
+#[derive(PartialEq)]
+enum View {
+    All,
+    Morning,
+    Night,
+    Normal,
+}
 // `Model` describes our app state.
 struct Model {
     day: i32,
-    // check: [bool; 672],
+    view: View,
     check: Data,
 }
 
@@ -111,7 +124,7 @@ fn mod_check(model: &mut Model, value: bool, day: i32, hours: i32, hour: i32, mi
     }
 }
 
-fn minuit_td(model: &Model, day: i32, hours: i32, hour: i32, minuit: i32) -> Node<Msg> {
+fn hour_td(model: &Model, day: i32, hours: i32, hour: i32, minuit: i32) -> Node<Msg> {
     let is = is_checked(model, day, hours, hour, minuit);
     let text = if hour == -1 {
         "".to_string()
@@ -136,7 +149,9 @@ fn minuit_td(model: &Model, day: i32, hours: i32, hour: i32, minuit: i32) -> Nod
         C!(is.to_string()),
         size,
         a!(
-            ev(Ev::Click, move |_| Msg::Check((!is, day, hours, hour, minuit))),
+            ev(Ev::Click, move |_| Msg::Check((
+                !is, day, hours, hour, minuit
+            ))),
             attrs!(At::Href => ""),
             text
         ),
@@ -144,38 +159,81 @@ fn minuit_td(model: &Model, day: i32, hours: i32, hour: i32, minuit: i32) -> Nod
     )
 }
 
-fn trs(model: &Model, day: i32, section: i32) -> Vec<Node<Msg>> {
+fn hours_td(model: &Model, day: i32, section: i32) -> Vec<Node<Msg>> {
     vec![
         tr!(
-            minuit_td(model, day, section, -1, -1),
-            minuit_td(model, day, section, section * 4 + 0, -1),
-            minuit_td(model, day, section, section * 4 + 0, 0)
+            hour_td(model, day, section, -1, -1),
+            hour_td(model, day, section, section * 4 + 0, -1),
+            hour_td(model, day, section, section * 4 + 0, 0)
         ),
-        tr!(minuit_td(model, day, section, section * 4 + 0, 1)),
-        tr!(minuit_td(model, day, section, section * 4 + 0, 2)),
-        tr!(minuit_td(model, day, section, section * 4 + 0, 3)),
+        tr!(hour_td(model, day, section, section * 4 + 0, 1)),
+        tr!(hour_td(model, day, section, section * 4 + 0, 2)),
+        tr!(hour_td(model, day, section, section * 4 + 0, 3)),
         tr!(
-            minuit_td(model, day, section, section * 4 + 1, -1),
-            minuit_td(model, day, section, section * 4 + 1, 0)
+            hour_td(model, day, section, section * 4 + 1, -1),
+            hour_td(model, day, section, section * 4 + 1, 0)
         ),
-        tr!(minuit_td(model, day, section, section * 4 + 1, 1)),
-        tr!(minuit_td(model, day, section, section * 4 + 1, 2)),
-        tr!(minuit_td(model, day, section, section * 4 + 1, 3)),
+        tr!(hour_td(model, day, section, section * 4 + 1, 1)),
+        tr!(hour_td(model, day, section, section * 4 + 1, 2)),
+        tr!(hour_td(model, day, section, section * 4 + 1, 3)),
         tr!(
-            minuit_td(model, day, section, section * 4 + 2, -1),
-            minuit_td(model, day, section, section * 4 + 2, 0)
+            hour_td(model, day, section, section * 4 + 2, -1),
+            hour_td(model, day, section, section * 4 + 2, 0)
         ),
-        tr!(minuit_td(model, day, section, section * 4 + 2, 1)),
-        tr!(minuit_td(model, day, section, section * 4 + 2, 2)),
-        tr!(minuit_td(model, day, section, section * 4 + 2, 3)),
+        tr!(hour_td(model, day, section, section * 4 + 2, 1)),
+        tr!(hour_td(model, day, section, section * 4 + 2, 2)),
+        tr!(hour_td(model, day, section, section * 4 + 2, 3)),
         tr!(
-            minuit_td(model, day, section, section * 4 + 3, -1),
-            minuit_td(model, day, section, section * 4 + 3, 0)
+            hour_td(model, day, section, section * 4 + 3, -1),
+            hour_td(model, day, section, section * 4 + 3, 0)
         ),
-        tr!(minuit_td(model, day, section, section * 4 + 3, 1)),
-        tr!(minuit_td(model, day, section, section * 4 + 3, 2)),
-        tr!(minuit_td(model, day, section, section * 4 + 3, 3))
+        tr!(hour_td(model, day, section, section * 4 + 3, 1)),
+        tr!(hour_td(model, day, section, section * 4 + 3, 2)),
+        tr!(hour_td(model, day, section, section * 4 + 3, 3)),
     ]
+}
+
+fn day_td_for_pc(model: &Model, day: i32) -> Node<Msg> {
+    let morning = if model.view == View::Morning || model.view == View::All {
+        vec![hours_td(model, day, 0), hours_td(model, day, 1)]
+    } else {
+        vec![]
+    };
+    let night = if model.view == View::Night || model.view == View::All {
+        vec![hours_td(model, day, 5)]
+    } else {
+        vec![]
+    };
+    table!(
+        C!("calender"),
+        thead!(th!(attrs!(At::ColSpan => "3"), "　")),
+        morning,
+        hours_td(model, day, 2),
+        hours_td(model, day, 3),
+        hours_td(model, day, 4),
+        night
+    )
+}
+
+fn day_td_for_phone(model: &Model, day: i32) -> Node<Msg> {
+    let morning = if model.view == View::Morning || model.view == View::All {
+        vec![hours_td(model, day, 0), hours_td(model, day, 1)]
+    } else {
+        vec![]
+    };
+    let night = if model.view == View::Night || model.view == View::All {
+        vec![hours_td(model, day, 5)]
+    } else {
+        vec![]
+    };
+    table!(
+        C!("calender"),
+        morning,
+        hours_td(model, day, 2),
+        hours_td(model, day, 3),
+        hours_td(model, day, 4),
+        night
+    )
 }
 
 // ------ ------
@@ -200,76 +258,13 @@ fn view(model: &Model) -> Node<Msg> {
                     th!(C!["false"], "土")
                 )
             ),
-            table!(
-                C!("calender"),
-                thead!(th!(attrs!(At::ColSpan => "3"), "　")),
-                trs(model, 0, 0),
-                trs(model, 0, 1),
-                trs(model, 0, 2),
-                trs(model, 0, 3),
-                trs(model, 0, 4),
-                trs(model, 0, 5)
-            ),
-            table!(
-                C!("calender"),
-                thead!(th!(attrs!(At::ColSpan => "3"), "　")),
-                trs(model, 1, 0),
-                trs(model, 1, 1),
-                trs(model, 1, 2),
-                trs(model, 1, 3),
-                trs(model, 1, 4),
-                trs(model, 1, 5)
-            ),
-            table!(
-                C!("calender"),
-                thead!(th!(attrs!(At::ColSpan => "3"), "　")),
-                trs(model, 2, 0),
-                trs(model, 2, 1),
-                trs(model, 2, 2),
-                trs(model, 2, 3),
-                trs(model, 2, 4),
-                trs(model, 2, 5)
-            ),
-            table!(
-                C!("calender"),
-                thead!(th!(attrs!(At::ColSpan => "3"), "　")),
-                trs(model, 3, 0),
-                trs(model, 3, 1),
-                trs(model, 3, 2),
-                trs(model, 3, 3),
-                trs(model, 3, 4),
-                trs(model, 3, 5)
-            ),
-            table!(
-                C!("calender"),
-                thead!(th!(attrs!(At::ColSpan => "3"), "　")),
-                trs(model, 4, 0),
-                trs(model, 4, 1),
-                trs(model, 4, 2),
-                trs(model, 4, 3),
-                trs(model, 4, 4),
-                trs(model, 4, 5)
-            ),
-            table!(
-                C!("calender"),
-                thead!(th!(attrs!(At::ColSpan => "3"), "　")),
-                trs(model, 5, 0),
-                trs(model, 5, 1),
-                trs(model, 5, 2),
-                trs(model, 5, 3),
-                trs(model, 5, 4),
-                trs(model, 5, 5)
-            ),
-            table!(
-                C!("calender"),
-                thead!(th!(attrs!(At::ColSpan => "3"), "　")),
-                trs(model, 6, 0),
-                trs(model, 6, 1),
-                trs(model, 6, 2),
-                trs(model, 6, 3),
-                trs(model, 6, 4),
-                trs(model, 6, 5)
-            )
+            day_td_for_pc(model, 0),
+            day_td_for_pc(model, 1),
+            day_td_for_pc(model, 2),
+            day_td_for_pc(model, 3),
+            day_td_for_pc(model, 4),
+            day_td_for_pc(model, 5),
+            day_td_for_pc(model, 6),
         ),
         section!(
             C!("phone"),
@@ -336,15 +331,7 @@ fn view(model: &Model) -> Node<Msg> {
                 )
             ),
             table!(thead!(th!(a!("　")))),
-            table!(
-                C!("calender"),
-                trs(model, model.day, 0),
-                trs(model, model.day, 1),
-                trs(model, model.day, 2),
-                trs(model, model.day, 3),
-                trs(model, model.day, 4),
-                trs(model, model.day, 5)
-            )
+            day_td_for_phone(model, model.day),
         ),
         p!(format!("予定コード : {:?}", model.check.to_string())),
         p!("予定コード入力欄"),
