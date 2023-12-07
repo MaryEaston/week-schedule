@@ -25,6 +25,7 @@ impl Data {
         }
     }
 
+    // 自身とのANDをとる
     pub fn and(datas: Vec<Data>) -> Self {
         let mut check = [true; 672];
         for data in datas {
@@ -35,16 +36,33 @@ impl Data {
         Data { check: check }
     }
 
-    pub fn to_string(&self) -> String {
+    pub fn _to_string(&self) -> String {
         let mut string = "".to_string();
         for i in 0..112 {
-            let int = (self.check[i * 6 + 0] as i32) * 1
-                + (self.check[i * 6 + 1] as i32) * 2
-                + (self.check[i * 6 + 2] as i32) * 4
-                + (self.check[i * 6 + 3] as i32) * 8
-                + (self.check[i * 6 + 4] as i32) * 16
-                + (self.check[i * 6 + 5] as i32) * 32;
+            let int = (self.check[i * 6 + 0] as u16) * 1
+                + (self.check[i * 6 + 1] as u16) * 2
+                + (self.check[i * 6 + 2] as u16) * 4
+                + (self.check[i * 6 + 3] as u16) * 8
+                + (self.check[i * 6 + 4] as u16) * 16
+                + (self.check[i * 6 + 5] as u16) * 32;
             string.insert(i, _int_to_char(int));
+        }
+        string
+    }
+
+    pub fn to_string(&self) -> String {
+        let mut string: String = "".to_string();
+
+        let mut mode: bool = false;
+        let mut count: u16 = 0;
+        for i in 0..671 {
+            if self.check[i] == mode {
+                count += 1;
+            } else {
+                mode = !mode;
+                string = string + &_int_to_string(count);
+                count = 0;
+            }
         }
         string
     }
@@ -58,7 +76,7 @@ impl Data {
     }
 }
 
-fn _int_to_char(int: i32) -> char {
+fn _int_to_char(int: u16) -> char {
     match int {
         0 => 'A',
         1 => 'B',
@@ -126,6 +144,15 @@ fn _int_to_char(int: i32) -> char {
         63 => '_',
         _ => '*',
     }
+}
+
+fn _int_to_string(int: u16) -> String {
+    let mut string = String::new();
+    let first = _int_to_char(int % 64);
+    let second = _int_to_char((int / 64) % 64);
+    string.push(first);
+    string.push(second);
+    string
 }
 
 fn string_to_check(data: &str) -> [bool; 672] {
